@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 from sklearn import svm
+from sklearn.metrics import accuracy_score
 
 filename = "data.csv"
 fields = []
@@ -15,24 +16,46 @@ with open(filename, 'r') as csvfile:
         y.append(int(row[3]))
 y = np.array([y]).T
 
-
 positive_count = np.sum(y==1)
 negative_count = np.sum(y==-1)
 positive_samples = list(np.where(y==1)[0])
 negative_samples = list(np.where(y==-1)[0])
-samples_in_fold1 = positive_samples[0:positive_count/2] + negative_samples[0:negative_count/2]
-samples_in_fold2 = positive_samples[positive_count/2:] + negative_samples[negative_count/2:]
-
 print positive_count, negative_count
 
+samples = []
 X_train = []
-for i in samples_in_fold1:
-    X_train.append(X[i])
-y_train = y[samples_in_fold1]
-X_pred = []
-for i in samples_in_fold2:
-    X_pred.append(X[i])
-clf = svm.SVC(gamma='scale')
+y_train = []
+X_test = []
+y_test = []
+accuracy = np.zeros(10)
+for i in range(2,11):
+    samples_in_fold = []
+    count1 = 0
+    count2 = 0
+    for j in range(i-1):
+        samples = positive_samples[count1: (count1 + positive_count/i)] \
+                + negative_samples[count2: (count2 + negative_count/i)]
+        samples_in_fold.append(samples)
+        count1 = count1 + positive_count/i
+        count2 = count2 + negative_count/i
+    samples = positive_samples[count1:] \
+              + negative_samples[count2:]
+    samples_in_fold.append(samples)
 
-print clf.fit(X_train, y_train)
-print clf.predict(X_pred)
+    for k in range(i):
+        for n in range(i):
+            if n != k:
+                for m in samples_in_fold[n]:
+                    X_train.append(X[m])
+                    y_train.append(y[m])
+        for m in samples_in_fold[k]:
+            X_test.append(X[m])
+            y_test.append(y[m])
+        clf = svm.SVC(gamma='scale')
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        accuracy[i-1] = accuracy[i-1] + accuracy_score(y_pred, y_test)
+        # print accuracy[i-1]
+    accuracy[i-1] = accuracy[i-1]/i
+    print accuracy[i-1]
+
