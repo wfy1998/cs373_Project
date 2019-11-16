@@ -1,31 +1,38 @@
-from sklearn import svm
 import csv
 import numpy as np
+from sklearn import svm
 
-X = [[0, 0], [1, 1]]
-y = [0, 1]
-def run(X, y):
-    filename = "data.csv"
-    fields = []
-    rows = []
-    lable = []
-    dataRow = []
-    with open(filename, 'r') as csvfile:
-        csvreader = csv.reader(csvfile)
-        fields = csvreader.next()
-        for row in csvreader:
-            dataRow.append(float(row[0]))
-            dataRow.append(float(row[1]))
-            dataRow.append(float(row[2]))
-            row[3] = float(row[3])
-            rows.append(dataRow)
-            lable.append(row[3])
+filename = "data.csv"
+fields = []
+X = []
+y = []
 
-    clf = svm.SVC(gamma='scale')
-    print clf.fit(rows, lable)
-    print clf.predict(rows)
+with open(filename, 'r') as csvfile:
+    csvreader = csv.reader(csvfile)
+    fields = csvreader.next()
+    for row in csvreader:
+        X.append(row[0:-2])
+        y.append(int(row[3]))
+y = np.array([y]).T
 
 
+positive_count = np.sum(y==1)
+negative_count = np.sum(y==-1)
+positive_samples = list(np.where(y==1)[0])
+negative_samples = list(np.where(y==-1)[0])
+samples_in_fold1 = positive_samples[0:positive_count/2] + negative_samples[0:negative_count/2]
+samples_in_fold2 = positive_samples[positive_count/2:] + negative_samples[negative_count/2:]
 
+print positive_count, negative_count
 
-run(X, y)
+X_train = []
+for i in samples_in_fold1:
+    X_train.append(X[i])
+y_train = y[samples_in_fold1]
+X_pred = []
+for i in samples_in_fold2:
+    X_pred.append(X[i])
+clf = svm.SVC(gamma='scale')
+
+print clf.fit(X_train, y_train)
+print clf.predict(X_pred)
