@@ -18,8 +18,6 @@ for i in range(np.shape(rows)[0]):
         else:
             rows[i][3] = -1
 
-        rows[i][0] = float(rows[i][0])
-
         if rows[i][2] == "Janeiro":
             rows[i][2] = 1
         elif rows[i][2] == "Fevereiro":
@@ -95,7 +93,8 @@ for i in range(np.shape(rows)[0]):
             rows[i][1] = 23
         elif rows[i][1] == "Distrito Federal":
             rows[i][1] = 24
-
+        elif rows[i][1] == "Par\xe1":
+            rows[i][1] = 25
         data.append(rows[i])
 
 
@@ -104,7 +103,6 @@ with open('data.csv', 'w') as writeFile:
     writer.writerows(data)
 
 
-print (data)
-
+# print (data)
 csvfile.close()
 writeFile.close()

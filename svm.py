@@ -55,7 +55,6 @@ for i in range(2,11):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
         accuracy[i-1] = accuracy[i-1] + accuracy_score(y_pred, y_test)
-        # print accuracy[i-1]
     accuracy[i-1] = accuracy[i-1]/i
     print accuracy[i-1]
 
