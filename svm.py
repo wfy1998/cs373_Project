@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 from sklearn import svm
-from sklearn.metrics import accuracy_score
+
 
 filename = "data.csv"
 fields = []
@@ -54,7 +54,12 @@ for i in range(2,11):
         clf = svm.SVC(gamma='scale')
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        accuracy[i-1] = accuracy[i-1] + accuracy_score(y_pred, y_test)
+        acc = 0
+        for z in range(len(y_test)):
+            if y_test[z] == y_pred[z]:
+                acc = acc + 1
+        acc = acc * 1.0 / len(y_test) * 1.0
+        accuracy[i - 1] = accuracy[i - 1] + acc
     accuracy[i-1] = accuracy[i-1]/i
     print accuracy[i-1]
 
